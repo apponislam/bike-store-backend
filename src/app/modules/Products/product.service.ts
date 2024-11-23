@@ -30,7 +30,7 @@ const updateProduct = async (id: string, updateData: Partial<Product>) => {
         throw new Error("Invalid ID format");
     }
 
-    const result = await productModel.findByIdAndUpdate(id, updateData, { new: true });
+    const result = await productModel.findByIdAndUpdate(id, updateData, { new: true, versionKey: false });
     return result;
 };
 

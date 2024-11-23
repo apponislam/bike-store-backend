@@ -15,7 +15,7 @@ export const createMainOrder = async (req: Request, res: Response) => {
     } catch (err) {
         if (err instanceof Error) {
             res.status(400).json({
-                message: "Order creation failed",
+                message: "Product not found",
                 success: false,
                 error: err,
             });

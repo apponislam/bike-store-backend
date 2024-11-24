@@ -25,6 +25,11 @@ const createOrder = async (orderData: Order) => {
     return result;
 };
 
+const allOrders = async () => {
+    const result = await orderModel.find();
+    return result;
+};
+
 const calculateTotalRevenue = async () => {
     try {
         const totalRevenue = await orderModel.aggregate([
@@ -65,4 +70,5 @@ const calculateTotalRevenue = async () => {
 export const orderServices = {
     createOrder,
     calculateTotalRevenue,
+    allOrders,
 };

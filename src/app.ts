@@ -10,7 +10,7 @@ app.use(cors());
 app.use("/", productRoute);
 app.use("/", orderRoute);
 app.get("/", (req: Request, res: Response) => {
-    res.send("Hello World! 2");
+    res.send("Bike Store is available");
 });
 
 export default app;

@@ -29,6 +29,24 @@ export const createMainOrder = async (req: Request, res: Response) => {
     }
 };
 
+const allOrders = async (req: Request, res: Response) => {
+    try {
+        const result = await orderServices.allOrders();
+
+        res.status(200).json({
+            message: "Bikes retrieved successfully",
+            status: true,
+            data: result,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Failed retrieving failed",
+            error: err,
+        });
+    }
+};
+
 export const getRevenue = async (req: Request, res: Response) => {
     try {
         const revenue = await orderServices.calculateTotalRevenue();
@@ -50,4 +68,5 @@ export const getRevenue = async (req: Request, res: Response) => {
 export const orderController = {
     createMainOrder,
     getRevenue,
+    allOrders,
 };

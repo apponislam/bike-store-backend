@@ -6,6 +6,8 @@ const router = express.Router();
 // POST /api/orders - Create a new order
 router.post("/api/orders", orderController.createMainOrder);
 
+router.get("/api/orders", orderController.allOrders);
+
 router.get("/api/orders/revenue", orderController.getRevenue);
 
 export const orderRoute = router;

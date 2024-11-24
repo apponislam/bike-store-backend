@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -8,13 +31,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productController = void 0;
 const product_service_1 = require("./product.service");
-const product_validation_1 = __importDefault(require("./product.validation"));
+const zod_1 = require("zod");
+const product_validation_1 = __importStar(require("./product.validation"));
+const mongoose_1 = require("mongoose");
 const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const product = req.body;
@@ -27,11 +49,52 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         });
     }
     catch (err) {
-        res.status(500).json({
-            message: "Validation failed",
-            success: false,
-            error: err,
-        });
+        // res.status(500).json({
+        //     message: "Validation failed",
+        //     success: false,
+        //     error: err,
+        // });
+        if (err instanceof zod_1.ZodError) {
+            // Map Zod error to your custom format
+            const transformedErrors = {};
+            err.issues.forEach((issue) => {
+                const field = issue.path[0];
+                const errorDetails = {
+                    message: issue.message,
+                    name: "ValidatorError",
+                    properties: {
+                        message: issue.message,
+                        type: issue.code,
+                    },
+                    kind: issue.code,
+                    path: field,
+                    value: req.body[field],
+                };
+                if (issue.code === "too_small" && "minimum" in issue) {
+                    errorDetails.properties.min = issue.minimum;
+                }
+                transformedErrors[field] = errorDetails;
+            });
+            res.status(400).json({
+                message: "Validation failed",
+                success: false,
+                error: {
+                    name: "ValidationError",
+                    errors: transformedErrors,
+                },
+                stack: err.stack,
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "Internal server error",
+                success: false,
+                error: {
+                    message: err.message,
+                    stack: err.stack,
+                },
+            });
+        }
     }
 });
 const allProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -82,7 +145,31 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const { productId } = req.params;
     const updateData = req.body;
     try {
-        const updatedProduct = yield product_service_1.productServices.updateProduct(productId, updateData);
+        // Validate the Product ID
+        if (!mongoose_1.Types.ObjectId.isValid(productId)) {
+            res.status(404).json({
+                message: "Invalid ID Not Found",
+                success: false,
+                error: {
+                    name: "ValidationError",
+                    errors: {
+                        productId: {
+                            message: "Invalid ID Not Found",
+                            name: "ValidatorError",
+                            properties: {
+                                message: "Invalid ID Not Found",
+                                type: "type_error",
+                            },
+                            kind: "type_error",
+                            path: "productId",
+                            value: productId,
+                        },
+                    },
+                },
+            });
+        }
+        const productValid = product_validation_1.updateProductValidation.parse(updateData);
+        const updatedProduct = yield product_service_1.productServices.updateProduct(productId, productValid);
         if (!updatedProduct) {
             res.status(404).json({
                 status: false,
@@ -95,12 +182,53 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
             data: updatedProduct,
         });
     }
-    catch (error) {
-        res.status(500).json({
-            status: false,
-            message: "Product updated failed",
-            error: error,
-        });
+    catch (err) {
+        // res.status(500).json({
+        //     status: false,
+        //     message: "Product updated failed",
+        //     error: err,
+        // });
+        if (err instanceof zod_1.ZodError) {
+            // Map Zod error to your custom format
+            const transformedErrors = {};
+            err.issues.forEach((issue) => {
+                const field = issue.path[0];
+                const errorDetails = {
+                    message: issue.message,
+                    name: "ValidatorError",
+                    properties: {
+                        message: issue.message,
+                        type: issue.code,
+                    },
+                    kind: issue.code,
+                    path: field,
+                    value: req.body[field],
+                };
+                if (issue.code === "too_small" && "minimum" in issue) {
+                    errorDetails.properties.min = issue.minimum;
+                }
+                transformedErrors[field] = errorDetails;
+            });
+            res.status(400).json({
+                message: "Validation failed",
+                success: false,
+                error: {
+                    name: "ValidationError",
+                    errors: transformedErrors,
+                },
+                stack: err.stack,
+            });
+        }
+        else {
+            res.status(500).json({
+                message: "Internal server error",
+                success: false,
+                error: {
+                    message: err.message,
+                    stack: err.stack,
+                },
+            });
+        }
     }
 });
 const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {

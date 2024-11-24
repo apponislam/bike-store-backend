@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { productServices } from "./product.service";
-import productValidation from "./product.validation";
+import { ZodError } from "zod";
+import productValidation, { updateProductValidation } from "./product.validation";
+import { Types } from "mongoose";
 
 const createProduct = async (req: Request, res: Response) => {
     try {
@@ -14,12 +16,55 @@ const createProduct = async (req: Request, res: Response) => {
             status: true,
             data: result,
         });
-    } catch (err) {
-        res.status(500).json({
-            message: "Validation failed",
-            success: false,
-            error: err,
-        });
+    } catch (err: any) {
+        // res.status(500).json({
+        //     message: "Validation failed",
+        //     success: false,
+        //     error: err,
+        // });
+        if (err instanceof ZodError) {
+            // Map Zod error to your custom format
+            const transformedErrors: Record<string, any> = {};
+
+            err.issues.forEach((issue) => {
+                const field = issue.path[0];
+
+                const errorDetails: any = {
+                    message: issue.message,
+                    name: "ValidatorError",
+                    properties: {
+                        message: issue.message,
+                        type: issue.code,
+                    },
+                    kind: issue.code,
+                    path: field,
+                    value: req.body[field],
+                };
+                if (issue.code === "too_small" && "minimum" in issue) {
+                    errorDetails.properties.min = issue.minimum;
+                }
+
+                transformedErrors[field] = errorDetails;
+            });
+            res.status(400).json({
+                message: "Validation failed",
+                success: false,
+                error: {
+                    name: "ValidationError",
+                    errors: transformedErrors,
+                },
+                stack: err.stack,
+            });
+        } else {
+            res.status(500).json({
+                message: "Internal server error",
+                success: false,
+                error: {
+                    message: err.message,
+                    stack: err.stack,
+                },
+            });
+        }
     }
 };
 
@@ -76,7 +121,33 @@ const updateProduct = async (req: Request, res: Response) => {
     const updateData = req.body;
 
     try {
-        const updatedProduct = await productServices.updateProduct(productId, updateData);
+        // Validate the Product ID
+        if (!Types.ObjectId.isValid(productId)) {
+            res.status(404).json({
+                message: "Invalid ID Not Found",
+                success: false,
+                error: {
+                    name: "ValidationError",
+                    errors: {
+                        productId: {
+                            message: "Invalid ID Not Found",
+                            name: "ValidatorError",
+                            properties: {
+                                message: "Invalid ID Not Found",
+                                type: "type_error",
+                            },
+                            kind: "type_error",
+                            path: "productId",
+                            value: productId,
+                        },
+                    },
+                },
+            });
+        }
+
+        const productValid = updateProductValidation.parse(updateData);
+
+        const updatedProduct = await productServices.updateProduct(productId, productValid);
 
         if (!updatedProduct) {
             res.status(404).json({
@@ -90,12 +161,56 @@ const updateProduct = async (req: Request, res: Response) => {
             message: "Product updated successfully",
             data: updatedProduct,
         });
-    } catch (error) {
-        res.status(500).json({
-            status: false,
-            message: "Product updated failed",
-            error: error,
-        });
+    } catch (err: any) {
+        // res.status(500).json({
+        //     status: false,
+        //     message: "Product updated failed",
+        //     error: err,
+        // });
+
+        if (err instanceof ZodError) {
+            // Map Zod error to your custom format
+            const transformedErrors: Record<string, any> = {};
+
+            err.issues.forEach((issue) => {
+                const field = issue.path[0];
+
+                const errorDetails: any = {
+                    message: issue.message,
+                    name: "ValidatorError",
+                    properties: {
+                        message: issue.message,
+                        type: issue.code,
+                    },
+                    kind: issue.code,
+                    path: field,
+                    value: req.body[field],
+                };
+                if (issue.code === "too_small" && "minimum" in issue) {
+                    errorDetails.properties.min = issue.minimum;
+                }
+
+                transformedErrors[field] = errorDetails;
+            });
+            res.status(400).json({
+                message: "Validation failed",
+                success: false,
+                error: {
+                    name: "ValidationError",
+                    errors: transformedErrors,
+                },
+                stack: err.stack,
+            });
+        } else {
+            res.status(500).json({
+                message: "Internal server error",
+                success: false,
+                error: {
+                    message: err.message,
+                    stack: err.stack,
+                },
+            });
+        }
     }
 };
 

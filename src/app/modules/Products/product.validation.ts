@@ -12,4 +12,6 @@ const productValidation = z.object({
     inStock: z.boolean({ message: "In-stock status must be a boolean" }),
 });
 
+export const updateProductValidation = productValidation.partial();
+
 export default productValidation;

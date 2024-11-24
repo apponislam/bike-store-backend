@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateProductValidation = void 0;
 const zod_1 = require("zod");
 const productValidation = zod_1.z.object({
     name: zod_1.z.string().min(1, { message: "Name is required" }),
@@ -12,4 +13,5 @@ const productValidation = zod_1.z.object({
     quantity: zod_1.z.number().int({ message: "Quantity must be an integer" }).nonnegative({ message: "Quantity must be a non-negative number" }),
     inStock: zod_1.z.boolean({ message: "In-stock status must be a boolean" }),
 });
+exports.updateProductValidation = productValidation.partial();
 exports.default = productValidation;

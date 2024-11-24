@@ -121,7 +121,6 @@ const updateProduct = async (req: Request, res: Response) => {
     const updateData = req.body;
 
     try {
-        // Validate the Product ID
         if (!Types.ObjectId.isValid(productId)) {
             res.status(404).json({
                 message: "Invalid ID Not Found",

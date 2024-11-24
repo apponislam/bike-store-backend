@@ -145,7 +145,6 @@ const updateProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const { productId } = req.params;
     const updateData = req.body;
     try {
-        // Validate the Product ID
         if (!mongoose_1.Types.ObjectId.isValid(productId)) {
             res.status(404).json({
                 message: "Invalid ID Not Found",

@@ -23,7 +23,6 @@ const createProduct = async (req: Request, res: Response) => {
         //     error: err,
         // });
         if (err instanceof ZodError) {
-            // Map Zod error to your custom format
             const transformedErrors: Record<string, any> = {};
 
             err.issues.forEach((issue) => {
@@ -100,14 +99,12 @@ const getProduct = async (req: Request, res: Response) => {
             });
         }
 
-        // If product found, return the product data
         res.status(200).json({
             status: true,
             message: "Product retrieved successfully",
             data: product,
         });
     } catch (error) {
-        // In case of any error during fetching, return a 500 error response
         res.status(500).json({
             status: false,
             message: "Failed retrieving product",

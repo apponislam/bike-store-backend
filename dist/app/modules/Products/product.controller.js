@@ -55,7 +55,6 @@ const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         //     error: err,
         // });
         if (err instanceof zod_1.ZodError) {
-            // Map Zod error to your custom format
             const transformedErrors = {};
             err.issues.forEach((issue) => {
                 const field = issue.path[0];
@@ -125,7 +124,6 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 message: "Product not found",
             });
         }
-        // If product found, return the product data
         res.status(200).json({
             status: true,
             message: "Product retrieved successfully",
@@ -133,7 +131,6 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
     catch (error) {
-        // In case of any error during fetching, return a 500 error response
         res.status(500).json({
             status: false,
             message: "Failed retrieving product",

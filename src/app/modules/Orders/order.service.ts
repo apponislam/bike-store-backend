@@ -1,3 +1,4 @@
+import AppError from "../../errors/AppError";
 import { productModel } from "../Products/products.model";
 import { Order } from "./order.interface";
 import { orderModel } from "./order.model";
@@ -6,11 +7,15 @@ const createOrder = async (orderData: Order) => {
     const product = await productModel.findById(orderData.product);
 
     if (!product) {
+        // console.log("After search ", product);
         throw new Error("Product not found");
     }
 
     if (product.quantity < orderData.quantity) {
-        throw new Error("Insufficient stock");
+        // console.log("Stock check ", product);
+        throw new AppError(404, "Insufficient stock");
+        // throw new Error("Insufficient stock");
+        return;
     }
 
     product.quantity -= orderData.quantity;

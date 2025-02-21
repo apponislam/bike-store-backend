@@ -97,6 +97,7 @@ const getProduct = async (req: Request, res: Response) => {
                 status: false,
                 message: "Product not found",
             });
+            return;
         }
 
         res.status(200).json({

@@ -12,10 +12,10 @@ export const createMainOrder = async (req: Request, res: Response) => {
             status: true,
             data: order,
         });
-    } catch (err) {
+    } catch (err: any) {
         if (err instanceof Error) {
             res.status(400).json({
-                message: "Product not found",
+                message: err.message || "Product not found",
                 success: false,
                 error: err,
             });

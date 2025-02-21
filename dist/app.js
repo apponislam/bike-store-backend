@@ -13,7 +13,7 @@ const notFount_1 = __importDefault(require("./app/errors/notFount"));
 const app = (0, express_1.default)();
 // const port = 3000;
 app.use(express_1.default.json());
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({ origin: "http://localhost:5173", credentials: true }));
 app.use("/", product_route_1.productRoute);
 app.use("/", order_route_1.orderRoute);
 app.use("/", user_route_1.userRoute);

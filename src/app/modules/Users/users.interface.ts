@@ -5,3 +5,8 @@ export type TUser = {
     photo: string;
     role: "admin" | "customer";
 };
+
+export type TUserLogin = {
+    email: string;
+    password: string;
+};

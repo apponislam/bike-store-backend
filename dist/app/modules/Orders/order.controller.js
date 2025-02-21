@@ -15,69 +15,32 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderController = exports.getRevenue = exports.createMainOrder = void 0;
 const order_service_1 = require("./order.service");
 const order_validation_1 = __importDefault(require("./order.validation"));
-const createMainOrder = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const orderData = order_validation_1.default.parse(req.body);
-        const order = yield order_service_1.orderServices.createOrder(orderData);
-        res.status(200).json({
-            message: "Order created successfully",
-            status: true,
-            data: order,
-        });
-    }
-    catch (err) {
-        if (err instanceof Error) {
-            res.status(400).json({
-                message: err.message || "Product not found",
-                success: false,
-                error: err,
-            });
-        }
-        else {
-            res.status(500).json({
-                message: "Internal server error",
-                success: false,
-                error: err,
-            });
-        }
-    }
-});
-exports.createMainOrder = createMainOrder;
-const allOrders = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const result = yield order_service_1.orderServices.allOrders();
-        res.status(200).json({
-            message: "Bikes retrieved successfully",
-            status: true,
-            data: result,
-        });
-    }
-    catch (err) {
-        res.status(500).json({
-            success: false,
-            message: "Failed retrieving failed",
-            error: err,
-        });
-    }
-});
-const getRevenue = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const revenue = yield order_service_1.orderServices.calculateTotalRevenue();
-        res.status(200).json({
-            message: "Revenue calculated successfully",
-            status: true,
-            data: { totalRevenue: revenue },
-        });
-    }
-    catch (err) {
-        res.status(500).json({
-            message: "Error calculating revenue",
-            success: false,
-            error: err,
-        });
-    }
-});
-exports.getRevenue = getRevenue;
+const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+exports.createMainOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const orderData = order_validation_1.default.parse(req.body);
+    const order = yield order_service_1.orderServices.createOrder(orderData);
+    res.status(200).json({
+        message: "Order created successfully",
+        status: true,
+        data: order,
+    });
+}));
+const allOrders = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield order_service_1.orderServices.allOrders();
+    res.status(200).json({
+        message: "Bikes retrieved successfully",
+        status: true,
+        data: result,
+    });
+}));
+exports.getRevenue = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const revenue = yield order_service_1.orderServices.calculateTotalRevenue();
+    res.status(200).json({
+        message: "Revenue calculated successfully",
+        status: true,
+        data: { totalRevenue: revenue },
+    });
+}));
 exports.orderController = {
     createMainOrder: exports.createMainOrder,
     getRevenue: exports.getRevenue,

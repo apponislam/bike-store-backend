@@ -9,6 +9,7 @@ const product_route_1 = require("./app/modules/Products/product.route");
 const order_route_1 = require("./app/modules/Orders/order.route");
 const user_route_1 = require("./app/modules/Users/user.route");
 const globalErrorHandler_1 = __importDefault(require("./app/errors/globalErrorHandler"));
+const notFount_1 = __importDefault(require("./app/errors/notFount"));
 const app = (0, express_1.default)();
 // const port = 3000;
 app.use(express_1.default.json());
@@ -20,4 +21,5 @@ app.get("/", (req, res) => {
     res.send("Bike Store is available");
 });
 app.use(globalErrorHandler_1.default);
+app.use(notFount_1.default);
 exports.default = app;

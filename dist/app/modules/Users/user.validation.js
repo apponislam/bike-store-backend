@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userUpdateValidation = exports.userLoginValidation = void 0;
+exports.userUpdateValidation = exports.refreshTokenValidation = exports.userLoginValidation = void 0;
 const zod_1 = require("zod");
 const userValidation = zod_1.z.object({
     body: zod_1.z
@@ -17,6 +17,13 @@ exports.userLoginValidation = zod_1.z.object({
     body: zod_1.z.object({
         email: zod_1.z.string({ required_error: "Email is required" }).email("Invalid email format").nonempty("Email is required"),
         password: zod_1.z.string({ required_error: "Password is required" }).nonempty("Password is required").min(4, "Password must be at least 6 characters long"),
+    }),
+});
+exports.refreshTokenValidation = zod_1.z.object({
+    cookies: zod_1.z.object({
+        refreshToken: zod_1.z.string({
+            required_error: "Refresh token is required!",
+        }),
     }),
 });
 exports.userUpdateValidation = userValidation.partial();

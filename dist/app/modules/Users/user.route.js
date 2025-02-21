@@ -34,5 +34,6 @@ const user_validation_1 = __importStar(require("./user.validation"));
 const router = express_1.default.Router();
 router.post("/api/users/register", (0, validateRequest_1.default)(user_validation_1.default), users_controller_1.userController.createUser);
 // router.post("/api/users/register", userController.createUser);
-router.post("/api/users/login", (0, validateRequest_1.default)(user_validation_1.userLoginValidation), users_controller_1.userController.loginUser);
+router.get("/api/users/login", (0, validateRequest_1.default)(user_validation_1.userLoginValidation), users_controller_1.userController.loginUser);
+router.post("/api/users/refresh-token", (0, validateRequest_1.default)(user_validation_1.refreshTokenValidation), users_controller_1.userController.refreshToken);
 exports.userRoute = router;

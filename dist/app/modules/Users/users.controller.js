@@ -15,6 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.userController = exports.loginUser = void 0;
 const user_service_1 = require("./user.service");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
+const http_status_1 = __importDefault(require("http-status"));
+const config_1 = __importDefault(require("../../config"));
 const createUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.body;
     const result = yield user_service_1.userServices.createUserIntoDB(user);
@@ -23,26 +26,49 @@ const createUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 
         name: result.name,
         email: result.email,
     };
-    res.status(201).json({
+    // res.status(201).json({
+    //     success: true,
+    //     message: "User Registered successfully",
+    //     statusCode: 201,
+    //     data: responseData,
+    // });
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
         success: true,
         message: "User Registered successfully",
-        statusCode: 201,
         data: responseData,
     });
 }));
 exports.loginUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
-    const { token, name, email: userEmail } = yield user_service_1.userServices.loginUser(email, password);
-    res.status(200).json({
+    const { accessToken, refreshToken } = yield user_service_1.userServices.loginUser(email, password);
+    res.cookie("refreshToken", refreshToken, {
+        secure: config_1.default.node_env === "production",
+        httpOnly: true,
+        sameSite: "none",
+        maxAge: 1000 * 60 * 60 * 24 * 365,
+    });
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
         success: true,
         message: "Login successful",
-        statusCode: 200,
         data: {
-            token,
+            accessToken,
         },
+    });
+}));
+const refreshToken = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { refreshToken } = req.cookies;
+    const result = yield user_service_1.userServices.refreshToken(refreshToken);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Access token retrieved succesfully!",
+        data: result,
     });
 }));
 exports.userController = {
     createUser,
     loginUser: exports.loginUser,
+    refreshToken,
 };

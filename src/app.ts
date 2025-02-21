@@ -4,6 +4,7 @@ import { productRoute } from "./app/modules/Products/product.route";
 import { orderRoute } from "./app/modules/Orders/order.route";
 import { userRoute } from "./app/modules/Users/user.route";
 import globalErrorHandler from "./app/errors/globalErrorHandler";
+import notFound from "./app/errors/notFount";
 const app: Application = express();
 // const port = 3000;
 app.use(express.json());
@@ -17,5 +18,6 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use(globalErrorHandler);
+app.use(notFound);
 
 export default app;

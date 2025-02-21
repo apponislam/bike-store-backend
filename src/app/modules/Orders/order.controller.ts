@@ -1,69 +1,38 @@
 import { Request, Response } from "express";
 import { orderServices } from "./order.service";
 import orderValidation from "./order.validation";
+import catchAsync from "../../utils/catchAsync";
 
-export const createMainOrder = async (req: Request, res: Response) => {
-    try {
-        const orderData = orderValidation.parse(req.body);
-        const order = await orderServices.createOrder(orderData);
+export const createMainOrder = catchAsync(async (req: Request, res: Response) => {
+    const orderData = orderValidation.parse(req.body);
+    const order = await orderServices.createOrder(orderData);
 
-        res.status(200).json({
-            message: "Order created successfully",
-            status: true,
-            data: order,
-        });
-    } catch (err: any) {
-        if (err instanceof Error) {
-            res.status(400).json({
-                message: err.message || "Product not found",
-                success: false,
-                error: err,
-            });
-        } else {
-            res.status(500).json({
-                message: "Internal server error",
-                success: false,
-                error: err,
-            });
-        }
-    }
-};
+    res.status(200).json({
+        message: "Order created successfully",
+        status: true,
+        data: order,
+    });
+});
 
-const allOrders = async (req: Request, res: Response) => {
-    try {
-        const result = await orderServices.allOrders();
+const allOrders = catchAsync(async (req: Request, res: Response) => {
+    const result = await orderServices.allOrders();
 
-        res.status(200).json({
-            message: "Bikes retrieved successfully",
-            status: true,
-            data: result,
-        });
-    } catch (err) {
-        res.status(500).json({
-            success: false,
-            message: "Failed retrieving failed",
-            error: err,
-        });
-    }
-};
+    res.status(200).json({
+        message: "Bikes retrieved successfully",
+        status: true,
+        data: result,
+    });
+});
 
-export const getRevenue = async (req: Request, res: Response) => {
-    try {
-        const revenue = await orderServices.calculateTotalRevenue();
+export const getRevenue = catchAsync(async (req: Request, res: Response) => {
+    const revenue = await orderServices.calculateTotalRevenue();
 
-        res.status(200).json({
-            message: "Revenue calculated successfully",
-            status: true,
-            data: { totalRevenue: revenue },
-        });
-    } catch (err) {
-        res.status(500).json({
-            message: "Error calculating revenue",
-            success: false,
-            error: err,
-        });
-    }
-};
+    res.status(200).json({
+        message: "Revenue calculated successfully",
+        status: true,
+        data: { totalRevenue: revenue },
+    });
+});
 
 export const orderController = {
     createMainOrder,

@@ -123,6 +123,7 @@ const getProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
                 status: false,
                 message: "Product not found",
             });
+            return;
         }
         res.status(200).json({
             status: true,

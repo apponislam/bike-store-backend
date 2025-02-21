@@ -28,7 +28,7 @@ const createMainOrder = (req, res) => __awaiter(void 0, void 0, void 0, function
     catch (err) {
         if (err instanceof Error) {
             res.status(400).json({
-                message: "Product not found",
+                message: err.message || "Product not found",
                 success: false,
                 error: err,
             });

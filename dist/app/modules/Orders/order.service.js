@@ -8,17 +8,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderServices = void 0;
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const products_model_1 = require("../Products/products.model");
 const order_model_1 = require("./order.model");
 const createOrder = (orderData) => __awaiter(void 0, void 0, void 0, function* () {
     const product = yield products_model_1.productModel.findById(orderData.product);
     if (!product) {
+        // console.log("After search ", product);
         throw new Error("Product not found");
     }
     if (product.quantity < orderData.quantity) {
-        throw new Error("Insufficient stock");
+        // console.log("Stock check ", product);
+        throw new AppError_1.default(404, "Insufficient stock");
+        // throw new Error("Insufficient stock");
+        return;
     }
     product.quantity -= orderData.quantity;
     if (product.quantity === 0) {

@@ -1,13 +1,19 @@
 import config from "../../config";
-import { userModel } from "./user.model";
 import { TUser } from "./users.interface";
 import bcrypt from "bcrypt";
 import { createToken, verifyToken } from "./users.utils";
 import AppError from "../../errors/AppError";
 import httpStatus from "http-status";
+import { JwtPayload } from "jsonwebtoken";
+import userModel from "./user.model";
 
 const createUserIntoDB = async (payload: TUser) => {
     const result = await userModel.create(payload);
+    return result;
+};
+
+const allUsers = async () => {
+    const result = await userModel.find().select("-password");
     return result;
 };
 
@@ -25,6 +31,7 @@ export const loginUser = async (email: string, password: string) => {
     const jwtPayload = {
         name: user.name,
         email: user.email,
+        photo: user.photo,
         role: user.role,
     };
 
@@ -59,8 +66,42 @@ const refreshToken = async (token: string) => {
     };
 };
 
+const changePassword = async (userData: JwtPayload, payload: { oldPassword: string; newPassword: string }) => {
+    const user = await userModel.findOne({ email: userData.email });
+
+    // console.log(userModel);
+
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "This user is not found !");
+    }
+
+    // console.log(userModel.isPasswordMatched);
+
+    const isMatched = await userModel.isPasswordMatched(payload.oldPassword, user.password);
+
+    if (!isMatched) {
+        throw new AppError(httpStatus.FORBIDDEN, "Password does not match");
+    }
+
+    const newHashedPassword = await bcrypt.hash(payload.newPassword, Number(config.bcrypt_salt_rounds));
+
+    await userModel.findOneAndUpdate(
+        {
+            email: userData.email,
+            role: userData.role,
+        },
+        {
+            password: newHashedPassword,
+        }
+    );
+
+    return null;
+};
+
 export const userServices = {
     createUserIntoDB,
+    allUsers,
     loginUser,
     refreshToken,
+    changePassword,
 };

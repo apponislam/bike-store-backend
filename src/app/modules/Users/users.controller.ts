@@ -15,18 +15,22 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
         email: result.email,
     };
 
-    // res.status(201).json({
-    //     success: true,
-    //     message: "User Registered successfully",
-    //     statusCode: 201,
-    //     data: responseData,
-    // });
-
     sendResponse(res, {
         statusCode: httpStatus.CREATED,
         success: true,
         message: "User Registered successfully",
         data: responseData,
+    });
+});
+
+const alUsers = catchAsync(async (req: Request, res: Response) => {
+    const result = await userServices.allUsers();
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "All Users retrived successfully",
+        data: result,
     });
 });
 
@@ -64,8 +68,24 @@ const refreshToken = catchAsync(async (req, res) => {
     });
 });
 
+const changePassword = catchAsync(async (req, res) => {
+    const { ...passwordData } = req.body;
+
+    // console.log(req.user);
+
+    const result = await userServices.changePassword(req.user, passwordData);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Password is updated succesfully!",
+        data: result,
+    });
+});
+
 export const userController = {
     createUser,
+    alUsers,
     loginUser,
     refreshToken,
+    changePassword,
 };

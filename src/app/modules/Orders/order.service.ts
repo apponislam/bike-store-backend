@@ -31,7 +31,7 @@ const createOrder = async (orderData: Order) => {
 };
 
 const allOrders = async () => {
-    const result = await orderModel.find();
+    const result = await orderModel.find().populate("product");
     return result;
 };
 

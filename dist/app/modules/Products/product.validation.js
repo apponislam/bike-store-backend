@@ -18,5 +18,7 @@ const productValidation = zod_1.z.object({
         inStock: zod_1.z.boolean({ message: "In-stock status must be a boolean" }),
     }),
 });
-exports.updateProductValidation = productValidation.partial();
+exports.updateProductValidation = zod_1.z.object({
+    body: productValidation.shape.body.partial(),
+});
 exports.default = productValidation;

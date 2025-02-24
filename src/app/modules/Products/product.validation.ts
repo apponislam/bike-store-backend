@@ -17,6 +17,8 @@ const productValidation = z.object({
     }),
 });
 
-export const updateProductValidation = productValidation.partial();
+export const updateProductValidation = z.object({
+    body: productValidation.shape.body.partial(),
+});
 
 export default productValidation;

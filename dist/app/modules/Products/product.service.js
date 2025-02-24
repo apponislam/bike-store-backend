@@ -22,6 +22,10 @@ const allProducts = (...args_1) => __awaiter(void 0, [...args_1], void 0, functi
     const result = yield products_model_1.productModel.find(filter).populate("user", "-password");
     return result;
 });
+const allProductsBrand = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield products_model_1.productModel.find({}, { category: 1, brand: 1, _id: 1 });
+    return result;
+});
 const productById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!mongoose_1.Types.ObjectId.isValid(id)) {
         throw new Error("Invalid ID format");
@@ -49,4 +53,5 @@ exports.productServices = {
     productById,
     updateProduct,
     deleteProduct,
+    allProductsBrand,
 };

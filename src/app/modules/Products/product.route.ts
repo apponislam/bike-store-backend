@@ -10,10 +10,12 @@ router.post("/api/products", auth, validateRequest(productValidation), productCo
 
 router.get("/api/products", productController.allProducts);
 
+router.get("/api/productsBrand", productController.allProductsBrand);
+
 router.get("/api/products/:productId", productController.getProduct);
 
-router.put("/api/products/:productId", validateRequest(updateProductValidation), productController.updateProduct);
+router.put("/api/products/:productId", auth, validateRequest(updateProductValidation), productController.updateProduct);
 
-router.delete("/api/products/:productId", productController.deleteProduct);
+router.delete("/api/products/:productId", auth, productController.deleteProduct);
 
 export const productRoute = router;

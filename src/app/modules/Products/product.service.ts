@@ -15,6 +15,11 @@ const allProducts = async (searchTerm: string = "", minPrice?: number, maxPrice?
     return result;
 };
 
+const allProductsBrand = async () => {
+    const result = await productModel.find({}, { category: 1, brand: 1, _id: 1 });
+    return result;
+};
+
 const productById = async (id: string) => {
     if (!Types.ObjectId.isValid(id)) {
         throw new Error("Invalid ID format");
@@ -47,4 +52,5 @@ export const productServices = {
     productById,
     updateProduct,
     deleteProduct,
+    allProductsBrand,
 };

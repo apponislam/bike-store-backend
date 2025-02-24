@@ -40,6 +40,16 @@ const allProducts = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const allProductsBrand = catchAsync(async (req: Request, res: Response) => {
+    const result = await productServices.allProductsBrand();
+
+    res.status(200).json({
+        message: "Bikes retrieved successfully",
+        status: true,
+        data: result,
+    });
+});
+
 const getProduct = catchAsync(async (req: Request, res: Response) => {
     const { productId } = req.params;
 
@@ -65,27 +75,9 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
     const { productId } = req.params;
     const updateData = req.body;
 
-    if (!Types.ObjectId.isValid(productId)) {
-        res.status(404).json({
-            message: "Invalid ID Not Found",
-            success: false,
-            error: {
-                name: "ValidationError",
-                errors: {
-                    productId: {
-                        message: "Invalid ID Not Found",
-                        name: "ValidatorError",
-                        properties: {
-                            message: "Invalid ID Not Found",
-                            type: "type_error",
-                        },
-                        kind: "type_error",
-                        path: "productId",
-                        value: productId,
-                    },
-                },
-            },
-        });
+    const user = req.user;
+    if (!user) {
+        throw new AppError(404, "User not found");
     }
 
     const updatedProduct = await productServices.updateProduct(productId, updateData);
@@ -106,6 +98,11 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
 
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
     const { productId } = req.params;
+    const user = req.user;
+
+    if (!user) {
+        throw new AppError(404, "User not found");
+    }
 
     const deletedProduct = await productServices.deleteProduct(productId);
 
@@ -129,4 +126,5 @@ export const productController = {
     getProduct,
     updateProduct,
     deleteProduct,
+    allProductsBrand,
 };

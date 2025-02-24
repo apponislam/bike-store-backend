@@ -14,7 +14,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productController = void 0;
 const product_service_1 = require("./product.service");
-const mongoose_1 = require("mongoose");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -43,6 +42,14 @@ const allProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, vo
         data: result,
     });
 }));
+const allProductsBrand = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield product_service_1.productServices.allProductsBrand();
+    res.status(200).json({
+        message: "Bikes retrieved successfully",
+        status: true,
+        data: result,
+    });
+}));
 const getProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { productId } = req.params;
     const product = yield product_service_1.productServices.productById(productId);
@@ -63,27 +70,9 @@ const getProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
 const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { productId } = req.params;
     const updateData = req.body;
-    if (!mongoose_1.Types.ObjectId.isValid(productId)) {
-        res.status(404).json({
-            message: "Invalid ID Not Found",
-            success: false,
-            error: {
-                name: "ValidationError",
-                errors: {
-                    productId: {
-                        message: "Invalid ID Not Found",
-                        name: "ValidatorError",
-                        properties: {
-                            message: "Invalid ID Not Found",
-                            type: "type_error",
-                        },
-                        kind: "type_error",
-                        path: "productId",
-                        value: productId,
-                    },
-                },
-            },
-        });
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(404, "User not found");
     }
     const updatedProduct = yield product_service_1.productServices.updateProduct(productId, updateData);
     if (!updatedProduct) {
@@ -100,6 +89,10 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
 }));
 const deleteProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { productId } = req.params;
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(404, "User not found");
+    }
     const deletedProduct = yield product_service_1.productServices.deleteProduct(productId);
     if (!deletedProduct) {
         res.status(404).json({
@@ -119,4 +112,5 @@ exports.productController = {
     getProduct,
     updateProduct,
     deleteProduct,
+    allProductsBrand,
 };

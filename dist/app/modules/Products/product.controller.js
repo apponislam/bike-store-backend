@@ -1,27 +1,4 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -37,13 +14,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.productController = void 0;
 const product_service_1 = require("./product.service");
-const product_validation_1 = __importStar(require("./product.validation"));
 const mongoose_1 = require("mongoose");
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = req.body;
-    const productValid = product_validation_1.default.parse(product);
-    const result = yield product_service_1.productServices.createProduct(productValid);
+    var _a;
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
+    if (!userId) {
+        throw new AppError_1.default(404, "User not found");
+    }
+    const product = Object.assign(Object.assign({}, req.body), { user: userId });
+    const result = yield product_service_1.productServices.createProduct(product);
     res.status(200).json({
         message: "Bike created successfully",
         status: true,
@@ -51,8 +32,11 @@ const createProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     });
 }));
 const allProducts = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const searchTerm = req.query.searchTerm || "";
-    const result = yield product_service_1.productServices.allProducts(searchTerm);
+    const { searchTerm, minPrice, maxPrice, brand, category, inStock } = req.query;
+    const parsedMinPrice = minPrice ? Number(minPrice) : undefined;
+    const parsedMaxPrice = maxPrice ? Number(maxPrice) : undefined;
+    const parsedInStock = inStock ? inStock === "true" : undefined;
+    const result = yield product_service_1.productServices.allProducts(searchTerm || "", parsedMinPrice, parsedMaxPrice, brand, category, parsedInStock);
     res.status(200).json({
         message: "Bikes retrieved successfully",
         status: true,
@@ -101,8 +85,7 @@ const updateProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
             },
         });
     }
-    const productValid = product_validation_1.updateProductValidation.parse(updateData);
-    const updatedProduct = yield product_service_1.productServices.updateProduct(productId, productValid);
+    const updatedProduct = yield product_service_1.productServices.updateProduct(productId, updateData);
     if (!updatedProduct) {
         res.status(404).json({
             status: false,

@@ -37,7 +37,7 @@ const createOrder = (orderData) => __awaiter(void 0, void 0, void 0, function* (
     return result;
 });
 const allOrders = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.orderModel.find();
+    const result = yield order_model_1.orderModel.find().populate("product");
     return result;
 });
 const calculateTotalRevenue = () => __awaiter(void 0, void 0, void 0, function* () {

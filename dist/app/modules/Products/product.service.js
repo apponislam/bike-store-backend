@@ -12,24 +12,21 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.productServices = void 0;
 const mongoose_1 = require("mongoose");
 const products_model_1 = require("./products.model");
+const getFilter_1 = require("../../utils/getFilter");
 const createProduct = (product) => __awaiter(void 0, void 0, void 0, function* () {
     const result = yield products_model_1.productModel.create(product);
     return result;
 });
-const allProducts = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (searchTerm = "") {
-    const filter = searchTerm
-        ? {
-            $or: [{ name: { $regex: searchTerm, $options: "i" } }, { brand: { $regex: searchTerm, $options: "i" } }, { category: { $regex: searchTerm, $options: "i" } }],
-        }
-        : {};
-    const result = yield products_model_1.productModel.find(filter);
+const allProducts = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (searchTerm = "", minPrice, maxPrice, brand, category, inStock) {
+    const filter = (0, getFilter_1.getFilter)(searchTerm, minPrice, maxPrice, brand, category, inStock);
+    const result = yield products_model_1.productModel.find(filter).populate("user", "-password");
     return result;
 });
 const productById = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!mongoose_1.Types.ObjectId.isValid(id)) {
         throw new Error("Invalid ID format");
     }
-    const result = yield products_model_1.productModel.findOne({ _id: id });
+    const result = yield products_model_1.productModel.findOne({ _id: id }).populate("user", "-password");
     return result;
 });
 const updateProduct = (id, updateData) => __awaiter(void 0, void 0, void 0, function* () {

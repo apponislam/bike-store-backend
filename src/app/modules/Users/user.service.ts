@@ -29,6 +29,7 @@ export const loginUser = async (email: string, password: string) => {
     }
 
     const jwtPayload = {
+        _id: user._id,
         name: user.name,
         email: user.email,
         photo: user.photo,

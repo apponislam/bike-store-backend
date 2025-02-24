@@ -17,7 +17,12 @@ const userSchema = new Schema<TUser, UserModel>(
             match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
         },
         password: { type: String, required: [true, "Password is required"] },
-        photo: { type: String, default: "" },
+        photo: { type: String, default: "https://ibb.co.com/QFgHxjnH" },
+        status: {
+            type: String,
+            enum: ["active", "blocked"],
+            default: "active",
+        },
         role: {
             type: String,
             enum: ["admin", "customer"],

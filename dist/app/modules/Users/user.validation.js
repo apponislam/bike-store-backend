@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.userUpdateValidation = exports.refreshTokenValidation = exports.userLoginValidation = void 0;
+exports.userUpdateValidation = exports.changePasswordValidationSchema = exports.refreshTokenValidation = exports.userLoginValidation = void 0;
 const zod_1 = require("zod");
 const userValidation = zod_1.z.object({
     body: zod_1.z
@@ -10,6 +10,7 @@ const userValidation = zod_1.z.object({
         password: zod_1.z.string({ required_error: "Password is required" }).min(6, { message: "Password must be at least 6 characters long" }).min(1, { message: "Password is required" }),
         photo: zod_1.z.string().url({ message: "Invalid photo URL" }).optional(),
         role: zod_1.z.enum(["admin", "customer"], { message: "Role must be 'admin' or 'customer'" }),
+        status: zod_1.z.enum(["active", "blocked"]).default("active"),
     })
         .strict(),
 });
@@ -24,6 +25,14 @@ exports.refreshTokenValidation = zod_1.z.object({
         refreshToken: zod_1.z.string({
             required_error: "Refresh token is required!",
         }),
+    }),
+});
+exports.changePasswordValidationSchema = zod_1.z.object({
+    body: zod_1.z.object({
+        oldPassword: zod_1.z.string({
+            required_error: "Old password is required",
+        }),
+        newPassword: zod_1.z.string({ required_error: "Password is required" }),
     }),
 });
 exports.userUpdateValidation = userValidation.partial();

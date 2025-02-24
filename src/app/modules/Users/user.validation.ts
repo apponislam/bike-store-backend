@@ -8,6 +8,7 @@ const userValidation = z.object({
             password: z.string({ required_error: "Password is required" }).min(6, { message: "Password must be at least 6 characters long" }).min(1, { message: "Password is required" }),
             photo: z.string().url({ message: "Invalid photo URL" }).optional(),
             role: z.enum(["admin", "customer"], { message: "Role must be 'admin' or 'customer'" }),
+            status: z.enum(["active", "blocked"]).default("active"),
         })
         .strict(),
 });

@@ -1,12 +1,8 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
+import { JwtPayload } from "jsonwebtoken"; // Assuming JwtPayload type is coming from jsonwebtoken
 
 interface AuthenticatedRequest extends Request {
-    user?: {
-        name: string;
-        email: string;
-        password: string;
-        role: "admin" | "customer";
-    };
+    user: JwtPayload; // user is no longer optional
 }
 
 export const isAdmin = (req: AuthenticatedRequest, res: Response, next: NextFunction) => {

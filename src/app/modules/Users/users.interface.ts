@@ -3,6 +3,7 @@ export type TUser = {
     email: string;
     password: string;
     photo: string;
+    status?: "active" | "blocked";
     role: "admin" | "customer";
 };
 

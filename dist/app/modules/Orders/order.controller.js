@@ -14,10 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderController = exports.getRevenue = exports.createMainOrder = void 0;
 const order_service_1 = require("./order.service");
-const order_validation_1 = __importDefault(require("./order.validation"));
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 exports.createMainOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const orderData = order_validation_1.default.parse(req.body);
+    const userId = req.user._id;
+    if (!userId) {
+        throw new AppError_1.default(404, "User not found");
+    }
+    const orderData = Object.assign(Object.assign({}, req.body), { user: userId });
     const order = yield order_service_1.orderServices.createOrder(orderData);
     res.status(200).json({
         message: "Order created successfully",

@@ -3,7 +3,7 @@ import { Order } from "./order.interface";
 
 const orderSchema = new Schema<Order>(
     {
-        email: { type: String, required: true },
+        user: { type: Schema.Types.ObjectId, ref: "user", required: true },
         product: {
             type: Schema.Types.ObjectId,
             ref: "product",

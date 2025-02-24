@@ -14,17 +14,21 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userServices = exports.loginUser = void 0;
 const config_1 = __importDefault(require("../../config"));
-const user_model_1 = require("./user.model");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const users_utils_1 = require("./users.utils");
 const AppError_1 = __importDefault(require("../../errors/AppError"));
 const http_status_1 = __importDefault(require("http-status"));
+const user_model_1 = __importDefault(require("./user.model"));
 const createUserIntoDB = (payload) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.userModel.create(payload);
+    const result = yield user_model_1.default.create(payload);
+    return result;
+});
+const allUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.default.find().select("-password");
     return result;
 });
 const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield user_model_1.userModel.findOne({ email });
+    const user = yield user_model_1.default.findOne({ email });
     if (!user) {
         throw new Error("User not found");
     }
@@ -33,8 +37,10 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
         throw new Error("Invalid credentials");
     }
     const jwtPayload = {
+        _id: user._id,
         name: user.name,
         email: user.email,
+        photo: user.photo,
         role: user.role,
     };
     const accessToken = (0, users_utils_1.createToken)(jwtPayload, config_1.default.jwt_secret, config_1.default.jwt_access_expire);
@@ -45,7 +51,7 @@ exports.loginUser = loginUser;
 const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
     const decoded = (0, users_utils_1.verifyToken)(token, config_1.default.jwt_refresh_secret);
     const { email } = decoded;
-    const user = yield user_model_1.userModel.findOne({ email });
+    const user = yield user_model_1.default.findOne({ email });
     if (!user) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "This user is not found !");
     }
@@ -59,8 +65,30 @@ const refreshToken = (token) => __awaiter(void 0, void 0, void 0, function* () {
         accessToken,
     };
 });
+const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.default.findOne({ email: userData.email });
+    // console.log(userModel);
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "This user is not found !");
+    }
+    // console.log(userModel.isPasswordMatched);
+    const isMatched = yield user_model_1.default.isPasswordMatched(payload.oldPassword, user.password);
+    if (!isMatched) {
+        throw new AppError_1.default(http_status_1.default.FORBIDDEN, "Password does not match");
+    }
+    const newHashedPassword = yield bcrypt_1.default.hash(payload.newPassword, Number(config_1.default.bcrypt_salt_rounds));
+    yield user_model_1.default.findOneAndUpdate({
+        email: userData.email,
+        role: userData.role,
+    }, {
+        password: newHashedPassword,
+    });
+    return null;
+});
 exports.userServices = {
     createUserIntoDB,
+    allUsers,
     loginUser: exports.loginUser,
     refreshToken,
+    changePassword,
 };

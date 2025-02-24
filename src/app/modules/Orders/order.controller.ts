@@ -1,10 +1,17 @@
 import { Request, Response } from "express";
 import { orderServices } from "./order.service";
-import orderValidation from "./order.validation";
 import catchAsync from "../../utils/catchAsync";
+import AppError from "../../errors/AppError";
 
 export const createMainOrder = catchAsync(async (req: Request, res: Response) => {
-    const orderData = orderValidation.parse(req.body);
+    const userId = req.user._id;
+
+    if (!userId) {
+        throw new AppError(404, "User not found");
+    }
+
+    const orderData = { ...req.body, user: userId };
+
     const order = await orderServices.createOrder(orderData);
 
     res.status(200).json({

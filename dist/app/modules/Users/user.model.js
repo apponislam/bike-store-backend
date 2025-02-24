@@ -25,7 +25,12 @@ const userSchema = new mongoose_1.Schema({
         match: [/^\S+@\S+\.\S+$/, "Invalid email format"],
     },
     password: { type: String, required: [true, "Password is required"] },
-    photo: { type: String, default: "" },
+    photo: { type: String, default: "https://ibb.co.com/QFgHxjnH" },
+    status: {
+        type: String,
+        enum: ["active", "blocked"],
+        default: "active",
+    },
     role: {
         type: String,
         enum: ["admin", "customer"],
@@ -49,4 +54,10 @@ userSchema.post("save", function (doc, next) {
     doc.password = "";
     next();
 });
+userSchema.statics.isPasswordMatched = function (plainTextPassword, hashedPassword) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield bcrypt_1.default.compare(plainTextPassword, hashedPassword);
+    });
+};
 exports.userModel = (0, mongoose_1.model)("user", userSchema);
+exports.default = exports.userModel;

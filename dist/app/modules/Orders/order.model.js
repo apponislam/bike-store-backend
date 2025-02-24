@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.orderModel = void 0;
 const mongoose_1 = require("mongoose");
 const orderSchema = new mongoose_1.Schema({
-    email: { type: String, required: true },
+    user: { type: mongoose_1.Schema.Types.ObjectId, ref: "user", required: true },
     product: {
         type: mongoose_1.Schema.Types.ObjectId,
         ref: "product",

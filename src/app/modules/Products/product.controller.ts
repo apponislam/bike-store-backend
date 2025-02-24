@@ -4,13 +4,18 @@ import { ZodError } from "zod";
 import productValidation, { updateProductValidation } from "./product.validation";
 import { Types } from "mongoose";
 import catchAsync from "../../utils/catchAsync";
+import AppError from "../../errors/AppError";
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-    const product = req.body;
+    const userId = req.user?._id;
 
-    const productValid = productValidation.parse(product);
+    if (!userId) {
+        throw new AppError(404, "User not found");
+    }
 
-    const result = await productServices.createProduct(productValid);
+    const product = { ...req.body, user: userId };
+
+    const result = await productServices.createProduct(product);
     res.status(200).json({
         message: "Bike created successfully",
         status: true,
@@ -19,8 +24,14 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 const allProducts = catchAsync(async (req: Request, res: Response) => {
-    const searchTerm = (req.query.searchTerm as string) || "";
-    const result = await productServices.allProducts(searchTerm);
+    const { searchTerm, minPrice, maxPrice, brand, category, inStock } = req.query;
+
+    const parsedMinPrice = minPrice ? Number(minPrice) : undefined;
+    const parsedMaxPrice = maxPrice ? Number(maxPrice) : undefined;
+
+    const parsedInStock = inStock ? inStock === "true" : undefined;
+
+    const result = await productServices.allProducts((searchTerm as string) || "", parsedMinPrice, parsedMaxPrice, brand as string, category as string, parsedInStock);
 
     res.status(200).json({
         message: "Bikes retrieved successfully",
@@ -77,9 +88,7 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
         });
     }
 
-    const productValid = updateProductValidation.parse(updateData);
-
-    const updatedProduct = await productServices.updateProduct(productId, productValid);
+    const updatedProduct = await productServices.updateProduct(productId, updateData);
 
     if (!updatedProduct) {
         res.status(404).json({

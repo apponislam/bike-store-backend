@@ -30,11 +30,14 @@ const allUsers = () => __awaiter(void 0, void 0, void 0, function* () {
 const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield user_model_1.default.findOne({ email });
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError_1.default(404, "User not found");
     }
     const isPasswordValid = yield bcrypt_1.default.compare(password, user.password);
     if (!isPasswordValid) {
-        throw new Error("Invalid credentials");
+        throw new AppError_1.default(401, "Invalid credentials");
+    }
+    if ((user === null || user === void 0 ? void 0 : user.status) === "blocked") {
+        throw new AppError_1.default(403, "This user is blocked!");
     }
     const jwtPayload = {
         _id: user._id,

@@ -20,12 +20,16 @@ const allUsers = async () => {
 export const loginUser = async (email: string, password: string) => {
     const user = await userModel.findOne({ email });
     if (!user) {
-        throw new Error("User not found");
+        throw new AppError(404, "User not found");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
-        throw new Error("Invalid credentials");
+        throw new AppError(401, "Invalid credentials");
+    }
+
+    if (user?.status === "blocked") {
+        throw new AppError(403, "This user is blocked!");
     }
 
     const jwtPayload = {

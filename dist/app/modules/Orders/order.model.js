@@ -4,14 +4,14 @@ const mongoose_1 = require("mongoose");
 const OrderSchema = new mongoose_1.Schema({
     user: {
         type: mongoose_1.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "user",
         required: true,
     },
     products: [
         {
             product: {
                 type: mongoose_1.Schema.Types.ObjectId,
-                ref: "Product",
+                ref: "product",
                 required: true,
             },
             quantity: {
@@ -29,6 +29,10 @@ const OrderSchema = new mongoose_1.Schema({
         enum: ["Pending", "Paid", "Shipped", "Completed", "Cancelled"],
         default: "Pending",
     },
+    estimateTime: {
+        type: String,
+        required: false,
+    },
     transaction: {
         id: String,
         transactionStatus: String,
@@ -40,6 +44,7 @@ const OrderSchema = new mongoose_1.Schema({
     },
 }, {
     timestamps: true,
+    versionKey: false,
 });
 const Order = (0, mongoose_1.model)("mainOrder", OrderSchema);
 exports.default = Order;

@@ -5,14 +5,14 @@ const OrderSchema = new Schema<IOrder>(
     {
         user: {
             type: Schema.Types.ObjectId,
-            ref: "Product",
+            ref: "user",
             required: true,
         },
         products: [
             {
                 product: {
                     type: Schema.Types.ObjectId,
-                    ref: "Product",
+                    ref: "product",
                     required: true,
                 },
                 quantity: {
@@ -30,6 +30,10 @@ const OrderSchema = new Schema<IOrder>(
             enum: ["Pending", "Paid", "Shipped", "Completed", "Cancelled"],
             default: "Pending",
         },
+        estimateTime: {
+            type: String,
+            required: false,
+        },
         transaction: {
             id: String,
             transactionStatus: String,
@@ -42,6 +46,7 @@ const OrderSchema = new Schema<IOrder>(
     },
     {
         timestamps: true,
+        versionKey: false,
     }
 );
 

@@ -8,6 +8,7 @@ export interface IOrder extends Document {
     }[];
     totalPrice: number;
     status: "Pending" | "Paid" | "Shipped" | "Completed" | "Cancelled";
+    estimateTime?: string;
     transaction: {
         id: string;
         transactionStatus: string;

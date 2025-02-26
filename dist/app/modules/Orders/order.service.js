@@ -61,7 +61,7 @@ const createOrder = (user, payload, client_ip) => __awaiter(void 0, void 0, void
     return payment.checkout_url;
 });
 const getOrders = () => __awaiter(void 0, void 0, void 0, function* () {
-    const data = yield order_model_1.default.find();
+    const data = yield order_model_1.default.find().populate("products.product").populate("user", "email name");
     return data;
 });
 const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* () {
@@ -81,8 +81,34 @@ const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* 
     }
     return verifiedPayment;
 });
+const findOrdersByUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const orders = yield order_model_1.default.find({ user: userId }).populate("products.product");
+    return orders;
+});
+const cancelOrder = (orderId) => __awaiter(void 0, void 0, void 0, function* () {
+    const order = yield order_model_1.default.findById(orderId);
+    if (!order) {
+        throw new Error("Order not found");
+    }
+    if (order.status === "Completed" || order.status === "Cancelled") {
+        throw new Error(`Order cannot be cancelled because it is already ${order.status}`);
+    }
+    order.status = "Cancelled";
+    yield order.save();
+    return order;
+});
+const updateOrderAdmin = (orderId, updateData) => __awaiter(void 0, void 0, void 0, function* () {
+    const updatedProduct = yield order_model_1.default.findByIdAndUpdate(orderId, Object.assign({}, updateData), { new: true });
+    if (!updatedProduct) {
+        throw new AppError_1.default(404, "Product not found");
+    }
+    return updatedProduct;
+});
 exports.orderService = {
     createOrder,
     getOrders,
     verifyPayment,
+    findOrdersByUser,
+    cancelOrder,
+    updateOrderAdmin,
 };

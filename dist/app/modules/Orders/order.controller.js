@@ -17,6 +17,7 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const order_service_1 = require("./order.service");
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const createOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.user;
     // console.log(req.body);
@@ -46,4 +47,48 @@ const verifyPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
         data: order,
     });
 }));
-exports.orderController = { createOrder, verifyPayment, getOrders };
+const getOrdersByUser = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(401, "Unauthorized access");
+    }
+    const orders = yield order_service_1.orderService.findOrdersByUser(user._id);
+    if (!orders.length) {
+        throw new AppError_1.default(404, "No order found for this user");
+    }
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Order retrived successfully",
+        data: orders,
+    });
+}));
+const cancelOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { orderId } = req.params;
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(401, "Unauthorized access");
+    }
+    const cancelledOrder = yield order_service_1.orderService.cancelOrder(orderId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Order cancelled successfully",
+        data: cancelledOrder,
+    });
+}));
+const updateOrderAdmin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(401, "You are unauthorized");
+    }
+    const { orderId } = req.params;
+    const updatedProduct = yield order_service_1.orderService.updateOrderAdmin(orderId, req.body);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: "Order updated successfully",
+        data: updatedProduct,
+    });
+});
+exports.orderController = { createOrder, verifyPayment, getOrders, getOrdersByUser, cancelOrder, updateOrderAdmin };

@@ -55,7 +55,7 @@ const createOrder = async (user: any, payload: { products: { product: string; qu
 };
 
 const getOrders = async () => {
-    const data = await Order.find();
+    const data = await Order.find().populate("products.product").populate("user", "email name");
     return data;
 };
 
@@ -82,8 +82,43 @@ const verifyPayment = async (order_id: string) => {
     return verifiedPayment;
 };
 
+const findOrdersByUser = async (userId: string) => {
+    const orders = await Order.find({ user: userId }).populate("products.product");
+    return orders;
+};
+
+const cancelOrder = async (orderId: string) => {
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+        throw new Error("Order not found");
+    }
+
+    if (order.status === "Completed" || order.status === "Cancelled") {
+        throw new Error(`Order cannot be cancelled because it is already ${order.status}`);
+    }
+
+    order.status = "Cancelled";
+    await order.save();
+
+    return order;
+};
+
+const updateOrderAdmin = async (orderId: string, updateData: any) => {
+    const updatedProduct = await Order.findByIdAndUpdate(orderId, { ...updateData }, { new: true });
+
+    if (!updatedProduct) {
+        throw new AppError(404, "Product not found");
+    }
+
+    return updatedProduct;
+};
+
 export const orderService = {
     createOrder,
     getOrders,
     verifyPayment,
+    findOrdersByUser,
+    cancelOrder,
+    updateOrderAdmin,
 };

@@ -12,41 +12,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.orderController = exports.getRevenue = exports.createMainOrder = void 0;
-const order_service_1 = require("./order.service");
+exports.orderController = void 0;
 const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
-const AppError_1 = __importDefault(require("../../errors/AppError"));
-exports.createMainOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const userId = req.user._id;
-    if (!userId) {
-        throw new AppError_1.default(404, "User not found");
-    }
-    const orderData = Object.assign(Object.assign({}, req.body), { user: userId });
-    const order = yield order_service_1.orderServices.createOrder(orderData);
-    res.status(200).json({
-        message: "Order created successfully",
-        status: true,
+const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
+const http_status_1 = __importDefault(require("http-status"));
+const order_service_1 = require("./order.service");
+const createOrder = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    // console.log(req.body);
+    const order = yield order_service_1.orderService.createOrder(user, req.body, req.ip);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        success: true,
+        message: "Order placed successfully",
         data: order,
     });
 }));
-const allOrders = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_service_1.orderServices.allOrders();
-    res.status(200).json({
-        message: "Bikes retrieved successfully",
-        status: true,
-        data: result,
+const getOrders = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const order = yield order_service_1.orderService.getOrders();
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        success: true,
+        message: "Order retrieved successfully",
+        data: order,
     });
 }));
-exports.getRevenue = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const revenue = yield order_service_1.orderServices.calculateTotalRevenue();
-    res.status(200).json({
-        message: "Revenue calculated successfully",
-        status: true,
-        data: { totalRevenue: revenue },
+const verifyPayment = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const order = yield order_service_1.orderService.verifyPayment(req.query.order_id);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.CREATED,
+        success: true,
+        message: "Order verified successfully",
+        data: order,
     });
 }));
-exports.orderController = {
-    createMainOrder: exports.createMainOrder,
-    getRevenue: exports.getRevenue,
-    allOrders,
-};
+exports.orderController = { createOrder, verifyPayment, getOrders };

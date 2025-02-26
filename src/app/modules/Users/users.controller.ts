@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import httpStatus from "http-status";
 import config from "../../config";
+import AppError from "../../errors/AppError";
 
 const createUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const user = req.body;
@@ -82,10 +83,28 @@ const changePassword = catchAsync(async (req, res) => {
     });
 });
 
+const toggleUserStatus = catchAsync(async (req: Request, res: Response) => {
+    const user = req.user;
+    if (!user) {
+        throw new AppError(403, "You are unauthorized to access this");
+    }
+
+    const { userId } = req.params;
+    const updatedUser = await userServices.updateUserStatus(userId);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: `User is now ${updatedUser.status}`,
+        data: updatedUser,
+    });
+});
+
 export const userController = {
     createUser,
     alUsers,
     loginUser,
     refreshToken,
     changePassword,
+    toggleUserStatus,
 };

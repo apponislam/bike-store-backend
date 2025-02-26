@@ -16,6 +16,6 @@ router.get("/api/products/:productId", productController.getProduct);
 
 router.put("/api/products/:productId", auth, validateRequest(updateProductValidation), productController.updateProduct);
 
-router.delete("/api/products/:productId", auth, productController.deleteProduct);
+router.put("/api/products/:productId/delete", auth, productController.deleteProduct);
 
 export const productRoute = router;

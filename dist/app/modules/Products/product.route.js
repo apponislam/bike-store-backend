@@ -38,5 +38,5 @@ router.get("/api/products", product_controller_1.productController.allProducts);
 router.get("/api/productsBrand", product_controller_1.productController.allProductsBrand);
 router.get("/api/products/:productId", product_controller_1.productController.getProduct);
 router.put("/api/products/:productId", auth_1.default, (0, validateRequest_1.default)(product_validation_1.updateProductValidation), product_controller_1.productController.updateProduct);
-router.delete("/api/products/:productId", auth_1.default, product_controller_1.productController.deleteProduct);
+router.put("/api/products/:productId/delete", auth_1.default, product_controller_1.productController.deleteProduct);
 exports.productRoute = router;

@@ -1,5 +1,6 @@
-import { Schema, model } from "mongoose";
+import { Query, Schema, model } from "mongoose";
 import { Product } from "./products.interface";
+import { NextFunction } from "express";
 
 const productSchema = new Schema<Product>(
     {
@@ -23,5 +24,30 @@ const productSchema = new Schema<Product>(
         versionKey: false,
     }
 );
+
+productSchema.pre("find", function (this: Query<any, Document>, next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+
+productSchema.pre("findOne", function (this: Query<any, Document>, next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+
+productSchema.pre("findOneAndUpdate", function (this: Query<any, Document>, next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+
+productSchema.pre("updateOne", function (this: Query<any, Document>, next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+
+productSchema.pre("findOneAndUpdate", function (this: Query<any, Document>, next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
 
 export const productModel = model<Product>("product", productSchema);

@@ -37,7 +37,7 @@ const loginUser = (email, password) => __awaiter(void 0, void 0, void 0, functio
         throw new AppError_1.default(401, "Invalid credentials");
     }
     if ((user === null || user === void 0 ? void 0 : user.status) === "blocked") {
-        throw new AppError_1.default(403, "This user is blocked!");
+        throw new AppError_1.default(403, "You are blocked!");
     }
     const jwtPayload = {
         _id: user._id,
@@ -88,10 +88,20 @@ const changePassword = (userData, payload) => __awaiter(void 0, void 0, void 0, 
     });
     return null;
 });
+const updateUserStatus = (userId) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = yield user_model_1.default.findById(userId);
+    if (!user) {
+        throw new AppError_1.default(http_status_1.default.NOT_FOUND, "User not found");
+    }
+    user.status = user.status === "active" ? "blocked" : "active";
+    yield user.save();
+    return user;
+});
 exports.userServices = {
     createUserIntoDB,
     allUsers,
     loginUser: exports.loginUser,
     refreshToken,
     changePassword,
+    updateUserStatus,
 };

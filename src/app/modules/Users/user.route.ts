@@ -16,4 +16,6 @@ router.post("/api/users/refresh-token", validateRequest(refreshTokenValidation),
 
 router.post("/api/users/change-password", auth, validateRequest(changePasswordValidationSchema), userController.changePassword);
 
+router.put("/api/users/change-status/:userId", auth, userController.toggleUserStatus);
+
 export const userRoute = router;

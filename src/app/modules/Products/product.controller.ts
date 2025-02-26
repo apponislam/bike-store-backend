@@ -104,9 +104,9 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(404, "User not found");
     }
 
-    const deletedProduct = await productServices.deleteProduct(productId);
+    const updatedProduct = await productServices.deleteProduct(productId);
 
-    if (!deletedProduct) {
+    if (!updatedProduct) {
         res.status(404).json({
             status: false,
             message: "Product not found",
@@ -115,8 +115,8 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
 
     res.status(200).json({
         status: true,
-        message: "Product deleted successfully",
-        data: {},
+        message: "Product marked as deleted successfully",
+        data: updatedProduct,
     });
 });
 

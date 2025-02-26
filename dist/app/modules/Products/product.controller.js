@@ -93,8 +93,8 @@ const deleteProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     if (!user) {
         throw new AppError_1.default(404, "User not found");
     }
-    const deletedProduct = yield product_service_1.productServices.deleteProduct(productId);
-    if (!deletedProduct) {
+    const updatedProduct = yield product_service_1.productServices.deleteProduct(productId);
+    if (!updatedProduct) {
         res.status(404).json({
             status: false,
             message: "Product not found",
@@ -102,8 +102,8 @@ const deleteProduct = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, 
     }
     res.status(200).json({
         status: true,
-        message: "Product deleted successfully",
-        data: {},
+        message: "Product marked as deleted successfully",
+        data: updatedProduct,
     });
 }));
 exports.productController = {

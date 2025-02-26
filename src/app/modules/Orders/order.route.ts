@@ -1,16 +1,11 @@
-import express from "express";
-import { orderController } from "./order.controller";
+import { Router } from "express";
 import auth from "../../middlewares/auth";
-import validateRequest from "../../middlewares/validateRequest";
-import orderValidation from "./order.validation";
+import { orderController } from "./order.controller";
 
-const router = express.Router();
+const orderRouter = Router();
 
-// POST /api/orders - Create a new order
-router.post("/api/orders", auth, validateRequest(orderValidation), orderController.createMainOrder);
+orderRouter.get("/api/order/verify", auth, orderController.verifyPayment);
 
-router.get("/api/orders", orderController.allOrders);
+orderRouter.route("/api/order").post(auth, orderController.createOrder).get(auth, orderController.getOrders);
 
-router.get("/api/orders/revenue", orderController.getRevenue);
-
-export const orderRoute = router;
+export default orderRouter;

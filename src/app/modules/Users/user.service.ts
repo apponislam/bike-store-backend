@@ -29,7 +29,7 @@ export const loginUser = async (email: string, password: string) => {
     }
 
     if (user?.status === "blocked") {
-        throw new AppError(403, "This user is blocked!");
+        throw new AppError(403, "You are blocked!");
     }
 
     const jwtPayload = {
@@ -103,10 +103,23 @@ const changePassword = async (userData: JwtPayload, payload: { oldPassword: stri
     return null;
 };
 
+const updateUserStatus = async (userId: string) => {
+    const user = await userModel.findById(userId);
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    }
+
+    user.status = user.status === "active" ? "blocked" : "active";
+    await user.save();
+
+    return user;
+};
+
 export const userServices = {
     createUserIntoDB,
     allUsers,
     loginUser,
     refreshToken,
     changePassword,
+    updateUserStatus,
 };

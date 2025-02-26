@@ -29,6 +29,7 @@ const catchAsync_1 = __importDefault(require("../../utils/catchAsync"));
 const sendResponse_1 = __importDefault(require("../../utils/sendResponse"));
 const http_status_1 = __importDefault(require("http-status"));
 const config_1 = __importDefault(require("../../config"));
+const AppError_1 = __importDefault(require("../../errors/AppError"));
 const createUser = (0, catchAsync_1.default)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const user = req.body;
     const result = yield user_service_1.userServices.createUserIntoDB(user);
@@ -92,10 +93,25 @@ const changePassword = (0, catchAsync_1.default)((req, res) => __awaiter(void 0,
         data: result,
     });
 }));
+const toggleUserStatus = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    if (!user) {
+        throw new AppError_1.default(403, "You are unauthorized to access this");
+    }
+    const { userId } = req.params;
+    const updatedUser = yield user_service_1.userServices.updateUserStatus(userId);
+    (0, sendResponse_1.default)(res, {
+        statusCode: http_status_1.default.OK,
+        success: true,
+        message: `User is now ${updatedUser.status}`,
+        data: updatedUser,
+    });
+}));
 exports.userController = {
     createUser,
     alUsers,
     loginUser: exports.loginUser,
     refreshToken,
     changePassword,
+    toggleUserStatus,
 };

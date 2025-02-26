@@ -21,4 +21,24 @@ const productSchema = new mongoose_1.Schema({
     timestamps: true,
     versionKey: false,
 });
+productSchema.pre("find", function (next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+productSchema.pre("findOne", function (next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+productSchema.pre("findOneAndUpdate", function (next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+productSchema.pre("updateOne", function (next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
+productSchema.pre("findOneAndUpdate", function (next) {
+    this.where({ isDelected: { $ne: true } });
+    next();
+});
 exports.productModel = (0, mongoose_1.model)("product", productSchema);

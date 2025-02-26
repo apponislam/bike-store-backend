@@ -44,7 +44,7 @@ const deleteProduct = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!mongoose_1.Types.ObjectId.isValid(id)) {
         throw new Error("Invalid ID format");
     }
-    const result = yield products_model_1.productModel.findByIdAndDelete(id);
+    const result = yield products_model_1.productModel.findByIdAndUpdate(id, { isDelected: true }, { new: true });
     return result;
 });
 exports.productServices = {

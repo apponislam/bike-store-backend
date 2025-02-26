@@ -1,48 +1,44 @@
-import { Request, Response } from "express";
-import { orderServices } from "./order.service";
 import catchAsync from "../../utils/catchAsync";
-import AppError from "../../errors/AppError";
+import sendResponse from "../../utils/sendResponse";
 
-export const createMainOrder = catchAsync(async (req: Request, res: Response) => {
-    const userId = req.user._id;
+import httpStatus from "http-status";
+import { orderService } from "./order.service";
 
-    if (!userId) {
-        throw new AppError(404, "User not found");
-    }
+const createOrder = catchAsync(async (req, res) => {
+    const user = req.user;
 
-    const orderData = { ...req.body, user: userId };
+    // console.log(req.body);
 
-    const order = await orderServices.createOrder(orderData);
+    const order = await orderService.createOrder(user, req.body, req.ip!);
 
-    res.status(200).json({
-        message: "Order created successfully",
-        status: true,
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Order placed successfully",
         data: order,
     });
 });
 
-const allOrders = catchAsync(async (req: Request, res: Response) => {
-    const result = await orderServices.allOrders();
+const getOrders = catchAsync(async (req, res) => {
+    const order = await orderService.getOrders();
 
-    res.status(200).json({
-        message: "Bikes retrieved successfully",
-        status: true,
-        data: result,
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Order retrieved successfully",
+        data: order,
     });
 });
 
-export const getRevenue = catchAsync(async (req: Request, res: Response) => {
-    const revenue = await orderServices.calculateTotalRevenue();
+const verifyPayment = catchAsync(async (req, res) => {
+    const order = await orderService.verifyPayment(req.query.order_id as string);
 
-    res.status(200).json({
-        message: "Revenue calculated successfully",
-        status: true,
-        data: { totalRevenue: revenue },
+    sendResponse(res, {
+        statusCode: httpStatus.CREATED,
+        success: true,
+        message: "Order verified successfully",
+        data: order,
     });
 });
 
-export const orderController = {
-    createMainOrder,
-    getRevenue,
-    allOrders,
-};
+export const orderController = { createOrder, verifyPayment, getOrders };

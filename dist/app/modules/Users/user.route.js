@@ -38,4 +38,5 @@ router.post("/api/users/register", (0, validateRequest_1.default)(user_validatio
 router.post("/api/users/login", (0, validateRequest_1.default)(user_validation_1.userLoginValidation), users_controller_1.userController.loginUser);
 router.post("/api/users/refresh-token", (0, validateRequest_1.default)(user_validation_1.refreshTokenValidation), users_controller_1.userController.refreshToken);
 router.post("/api/users/change-password", auth_1.default, (0, validateRequest_1.default)(user_validation_1.changePasswordValidationSchema), users_controller_1.userController.changePassword);
+router.put("/api/users/change-status/:userId", auth_1.default, users_controller_1.userController.toggleUserStatus);
 exports.userRoute = router;

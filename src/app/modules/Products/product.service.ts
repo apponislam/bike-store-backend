@@ -42,7 +42,8 @@ const deleteProduct = async (id: string) => {
         throw new Error("Invalid ID format");
     }
 
-    const result = await productModel.findByIdAndDelete(id);
+    const result = await productModel.findByIdAndUpdate(id, { isDelected: true }, { new: true });
+
     return result;
 };
 

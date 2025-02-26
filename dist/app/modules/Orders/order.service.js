@@ -12,73 +12,77 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.orderServices = void 0;
+exports.orderService = void 0;
+const order_model_1 = __importDefault(require("./order.model"));
+const http_status_1 = __importDefault(require("http-status"));
 const AppError_1 = __importDefault(require("../../errors/AppError"));
+const order_utils_1 = require("./order.utils");
 const products_model_1 = require("../Products/products.model");
-const order_model_1 = require("./order.model");
-const createOrder = (orderData) => __awaiter(void 0, void 0, void 0, function* () {
-    const product = yield products_model_1.productModel.findById(orderData.product);
-    if (!product) {
-        // console.log("After search ", product);
-        throw new Error("Product not found");
-    }
-    if (product.quantity < orderData.quantity) {
-        // console.log("Stock check ", product);
-        throw new AppError_1.default(404, "Insufficient stock");
-        // throw new Error("Insufficient stock");
-        return;
-    }
-    product.quantity -= orderData.quantity;
-    if (product.quantity === 0) {
-        product.inStock = false;
-    }
-    yield product.save();
-    const result = yield order_model_1.orderModel.create(orderData);
-    return result;
-});
-const allOrders = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield order_model_1.orderModel.find().populate("product");
-    return result;
-});
-const calculateTotalRevenue = () => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        const totalRevenue = yield order_model_1.orderModel.aggregate([
-            {
-                $lookup: {
-                    from: "products",
-                    localField: "product",
-                    foreignField: "_id",
-                    as: "productDetails",
-                },
-            },
-            { $unwind: "$productDetails" },
-            {
-                $project: {
-                    revenue: {
-                        $multiply: ["$quantity", "$productDetails.price"],
-                    },
-                },
-            },
-            {
-                $group: {
-                    _id: null,
-                    totalRevenue: { $sum: "$revenue" },
-                },
-            },
-        ]);
-        return totalRevenue.length > 0 ? totalRevenue[0].totalRevenue : 0;
-    }
-    catch (err) {
-        if (err instanceof Error) {
-            throw new Error("Error calculating total revenue: " + err.message);
+const createOrder = (user, payload, client_ip) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    if (!((_a = payload === null || payload === void 0 ? void 0 : payload.products) === null || _a === void 0 ? void 0 : _a.length))
+        throw new AppError_1.default(http_status_1.default.NOT_ACCEPTABLE, "Order is not specified");
+    const products = payload.products;
+    let totalPrice = 0;
+    const productDetails = yield Promise.all(products.map((item) => __awaiter(void 0, void 0, void 0, function* () {
+        const product = yield products_model_1.productModel.findById(item.product);
+        if (product) {
+            const subtotal = product ? (product.price || 0) * item.quantity : 0;
+            totalPrice += subtotal;
+            return item;
         }
-        else {
-            throw new Error("Unknown error occurred while calculating revenue");
-        }
+    })));
+    let order = yield order_model_1.default.create({
+        user,
+        products: productDetails,
+        totalPrice,
+    });
+    // payment integration
+    const shurjopayPayload = {
+        amount: totalPrice,
+        order_id: order._id,
+        currency: "BDT",
+        customer_name: user.name,
+        customer_address: "N/A",
+        customer_email: user.email,
+        customer_phone: "N/A",
+        customer_city: "N/A",
+        client_ip,
+    };
+    const payment = yield order_utils_1.orderUtils.makePaymentAsync(shurjopayPayload);
+    if (payment === null || payment === void 0 ? void 0 : payment.transactionStatus) {
+        order = yield order.updateOne({
+            transaction: {
+                id: payment.sp_order_id,
+                transactionStatus: payment.transactionStatus,
+            },
+        });
     }
+    return payment.checkout_url;
 });
-exports.orderServices = {
+const getOrders = () => __awaiter(void 0, void 0, void 0, function* () {
+    const data = yield order_model_1.default.find();
+    return data;
+});
+const verifyPayment = (order_id) => __awaiter(void 0, void 0, void 0, function* () {
+    const verifiedPayment = yield order_utils_1.orderUtils.verifyPaymentAsync(order_id);
+    if (verifiedPayment.length) {
+        yield order_model_1.default.findOneAndUpdate({
+            "transaction.id": order_id,
+        }, {
+            "transaction.bank_status": verifiedPayment[0].bank_status,
+            "transaction.sp_code": verifiedPayment[0].sp_code,
+            "transaction.sp_message": verifiedPayment[0].sp_message,
+            "transaction.transactionStatus": verifiedPayment[0].transaction_status,
+            "transaction.method": verifiedPayment[0].method,
+            "transaction.date_time": verifiedPayment[0].date_time,
+            status: verifiedPayment[0].bank_status == "Success" ? "Paid" : verifiedPayment[0].bank_status == "Failed" ? "Pending" : verifiedPayment[0].bank_status == "Cancel" ? "Cancelled" : "",
+        });
+    }
+    return verifiedPayment;
+});
+exports.orderService = {
     createOrder,
-    calculateTotalRevenue,
-    allOrders,
+    getOrders,
+    verifyPayment,
 };

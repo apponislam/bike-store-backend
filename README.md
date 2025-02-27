@@ -60,6 +60,21 @@ npm install
 # PORT=5000
 # MONGODB_URI=your-mongodb-connection-string
 
+# Authentication
+# BCRYPT_SALT_ROUNDS=12
+# JWT_SECRET=your_jwt_secret
+# JWT_REFRESH_SECRET=your_refresh_secret
+# JWT_ACCESS_EXPIRE=30d
+# JWT_REFRESH_EXPIRE=365d
+
+# Payment Gateway
+# SP_ENDPOINT=https://sandbox.shurjopayment.com
+# SP_USERNAME=your_sp_username
+# SP_PASSWORD=your_sp_password
+# SP_PREFIX=SP
+# SP_RETURN_URL=https://your-frontend-url/order/verify
+
+
 # Start the development server
 npm run start:dev
 
@@ -72,20 +87,96 @@ npm start
 
 ## API Endpoints
 
-### Products
+# API Endpoints
 
-| Method | Endpoint            | Description                      |
-| ------ | ------------------- | -------------------------------- |
-| POST   | `/api/products`     | Create a new product.            |
-| GET    | `/api/products`     | Retrieve all products.           |
-| GET    | `/api/products/:id` | Retrieve a single product by ID. |
-| PUT    | `/api/products/:id` | Update a product by ID.          |
-| DELETE | `/api/products/:id` | Delete a product by ID.          |
+## Products
 
-### Orders
+| Method | Endpoint                          | Description                     | Auth Required |
+| ------ | --------------------------------- | ------------------------------- | ------------- |
+| POST   | `/api/products`                   | Create a new product            | ✅ Yes        |
+| GET    | `/api/products`                   | Retrieve all products           | ❌ No         |
+| GET    | `/api/productsBrand`              | Retrieve all product brands     | ❌ No         |
+| GET    | `/api/products/:productId`        | Retrieve a single product by ID | ❌ No         |
+| PUT    | `/api/products/:productId`        | Update a product by ID          | ✅ Yes        |
+| PUT    | `/api/products/:productId/delete` | Soft-delete a product by ID     | ✅ Yes        |
 
-| Method | Endpoint              | Description              |
-| ------ | --------------------- | ------------------------ |
-| POST   | `/api/orders`         | Create a new order.      |
-| GET    | `/api/orders`         | Retrieve all orders.     |
-| GET    | `/api/orders/revenue` | Calculate total revenue. |
+---
+
+## Users
+
+| Method | Endpoint                           | Description                     | Auth Required |
+| ------ | ---------------------------------- | ------------------------------- | ------------- |
+| GET    | `/api/users`                       | Retrieve all users (admin only) | ✅ Yes        |
+| POST   | `/api/users/register`              | Register a new user             | ❌ No         |
+| POST   | `/api/users/login`                 | Login a user                    | ❌ No         |
+| POST   | `/api/users/refresh-token`         | Refresh access token            | ❌ No         |
+| POST   | `/api/users/change-password`       | Change password                 | ✅ Yes        |
+| PUT    | `/api/users/change-status/:userId` | Toggle user status              | ✅ Yes        |
+
+---
+
+## Orders
+
+| Method | Endpoint                      | Description                             | Auth Required |
+| ------ | ----------------------------- | --------------------------------------- | ------------- |
+| GET    | `/api/order/verify`           | Verify payment for an order             | ✅ Yes        |
+| POST   | `/api/order`                  | Create a new order                      | ✅ Yes        |
+| GET    | `/api/order`                  | Retrieve all orders (admin or user)     | ✅ Yes        |
+| GET    | `/api/orders`                 | Retrieve all orders for a specific user | ✅ Yes        |
+| PATCH  | `/api/orders/:orderId/cancel` | Cancel an order                         | ✅ Yes        |
+| PUT    | `/api/orders/:orderId/update` | Update order status by admin            | ✅ Yes        |
+
+---
+
+### Auth Key
+
+✅ = Authentication required  
+❌ = No authentication required
+
+---# API Endpoints
+
+## Products
+
+| Method | Endpoint                          | Description                     | Auth Required |
+| ------ | --------------------------------- | ------------------------------- | ------------- |
+| POST   | `/api/products`                   | Create a new product            | ✅ Yes        |
+| GET    | `/api/products`                   | Retrieve all products           | ❌ No         |
+| GET    | `/api/productsBrand`              | Retrieve all product brands     | ❌ No         |
+| GET    | `/api/products/:productId`        | Retrieve a single product by ID | ❌ No         |
+| PUT    | `/api/products/:productId`        | Update a product by ID          | ✅ Yes        |
+| PUT    | `/api/products/:productId/delete` | Soft-delete a product by ID     | ✅ Yes        |
+
+---
+
+## Users
+
+| Method | Endpoint                           | Description                     | Auth Required |
+| ------ | ---------------------------------- | ------------------------------- | ------------- |
+| GET    | `/api/users`                       | Retrieve all users (admin only) | ✅ Yes        |
+| POST   | `/api/users/register`              | Register a new user             | ❌ No         |
+| POST   | `/api/users/login`                 | Login a user                    | ❌ No         |
+| POST   | `/api/users/refresh-token`         | Refresh access token            | ❌ No         |
+| POST   | `/api/users/change-password`       | Change password                 | ✅ Yes        |
+| PUT    | `/api/users/change-status/:userId` | Toggle user status              | ✅ Yes        |
+
+---
+
+## Orders
+
+| Method | Endpoint                      | Description                             | Auth Required |
+| ------ | ----------------------------- | --------------------------------------- | ------------- |
+| GET    | `/api/order/verify`           | Verify payment for an order             | ✅ Yes        |
+| POST   | `/api/order`                  | Create a new order                      | ✅ Yes        |
+| GET    | `/api/order`                  | Retrieve all orders (admin or user)     | ✅ Yes        |
+| GET    | `/api/orders`                 | Retrieve all orders for a specific user | ✅ Yes        |
+| PATCH  | `/api/orders/:orderId/cancel` | Cancel an order                         | ✅ Yes        |
+| PUT    | `/api/orders/:orderId/update` | Update order status by admin            | ✅ Yes        |
+
+---
+
+### Auth Key
+
+✅ = Authentication required  
+❌ = No authentication required
+
+---

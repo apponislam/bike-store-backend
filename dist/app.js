@@ -13,7 +13,7 @@ const order_route_1 = __importDefault(require("./app/modules/Orders/order.route"
 const app = (0, express_1.default)();
 // const port = 3000;
 app.use(express_1.default.json());
-app.use((0, cors_1.default)({ origin: "http://localhost:5173", credentials: true }));
+app.use((0, cors_1.default)({ origin: ["http://localhost:5173", "https://peppy-hotteok-65ea2d.netlify.app/"], credentials: true }));
 app.use("/", product_route_1.productRoute);
 app.use("/", order_route_1.default);
 app.use("/", user_route_1.userRoute);

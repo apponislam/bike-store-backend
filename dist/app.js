@@ -10,6 +10,7 @@ const user_route_1 = require("./app/modules/Users/user.route");
 const globalErrorHandler_1 = __importDefault(require("./app/errors/globalErrorHandler"));
 const notFount_1 = __importDefault(require("./app/errors/notFount"));
 const order_route_1 = __importDefault(require("./app/modules/Orders/order.route"));
+const contact_route_1 = require("./app/modules/Contacts/contact.route");
 const app = (0, express_1.default)();
 // const port = 3000;
 app.use(express_1.default.json());
@@ -17,6 +18,7 @@ app.use((0, cors_1.default)({ origin: ["http://localhost:5173", "https://peppy-h
 app.use("/", product_route_1.productRoute);
 app.use("/", order_route_1.default);
 app.use("/", user_route_1.userRoute);
+app.use("/", contact_route_1.contactRoute);
 app.get("/", (req, res) => {
     res.send("Bike Store is available");
 });

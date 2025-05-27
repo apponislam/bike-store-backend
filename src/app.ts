@@ -5,6 +5,7 @@ import { userRoute } from "./app/modules/Users/user.route";
 import globalErrorHandler from "./app/errors/globalErrorHandler";
 import notFound from "./app/errors/notFount";
 import orderRouter from "./app/modules/Orders/order.route";
+import { contactRoute } from "./app/modules/Contacts/contact.route";
 const app: Application = express();
 // const port = 3000;
 app.use(express.json());
@@ -14,6 +15,8 @@ app.use("/", productRoute);
 
 app.use("/", orderRouter);
 app.use("/", userRoute);
+app.use("/", contactRoute);
+
 app.get("/", (req: Request, res: Response) => {
     res.send("Bike Store is available");
 });

@@ -12,7 +12,18 @@ const getAllContacts = async () => {
     return result;
 };
 
+const deleteContact = async (id: string) => {
+    if (!Types.ObjectId.isValid(id)) {
+        throw new Error("Invalid contact ID");
+    }
+
+    const result = await contactModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+
+    return result;
+};
+
 export const contactServices = {
     createContact,
     getAllContacts,
+    deleteContact,
 };

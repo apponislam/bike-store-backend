@@ -15,4 +15,5 @@ router.get("/api/blogs", blog_controller_1.blogController.getAllBlogs);
 router.get("/api/blogs/:id", blog_controller_1.blogController.getSingleBlog);
 router.patch("/api/blogs/:id", auth_1.default, (0, validateRequest_1.default)(blog_validation_1.default.partial()), blog_controller_1.blogController.updateBlog);
 router.delete("/api/blogs/:id", auth_1.default, blog_controller_1.blogController.deleteBlog);
+router.get("/api/blogs/me", auth_1.default, blog_controller_1.blogController.getMyBlogs);
 exports.blogRoute = router;

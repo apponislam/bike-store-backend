@@ -13,4 +13,6 @@ router.get("/api/blogs/:id", blogController.getSingleBlog);
 router.patch("/api/blogs/:id", auth, validateRequest(blogValidation.partial()), blogController.updateBlog);
 router.delete("/api/blogs/:id", auth, blogController.deleteBlog);
 
+router.get("/api/blogs/me", auth, blogController.getMyBlogs);
+
 export const blogRoute = router;

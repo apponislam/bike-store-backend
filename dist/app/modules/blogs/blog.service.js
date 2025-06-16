@@ -59,9 +59,26 @@ const deleteBlog = (id, userId) => __awaiter(void 0, void 0, void 0, function* (
     }
     return yield blog_model_1.blogModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 });
+const getMyBlogs = (userId_1, ...args_1) => __awaiter(void 0, [userId_1, ...args_1], void 0, function* (userId, filters = {}) {
+    const query = {
+        author: userId,
+        isDeleted: { $ne: true },
+    };
+    if (filters.category) {
+        query.category = filters.category;
+    }
+    if (filters.status) {
+        query.status = filters.status;
+    }
+    if (filters.search) {
+        query.$or = [{ title: { $regex: filters.search, $options: "i" } }, { excerpt: { $regex: filters.search, $options: "i" } }];
+    }
+    return yield blog_model_1.blogModel.find(query).populate("author", "name email photo role").sort({ createdAt: -1 });
+});
 exports.blogServices = {
     createBlog,
     getAllBlogs,
+    getMyBlogs,
     getSingleBlog,
     updateBlog,
     deleteBlog,

@@ -7,7 +7,7 @@ const blogSchema = new Schema<Blog>(
         excerpt: { type: String, required: true },
         content: { type: String, required: true },
         image: { type: String, required: true },
-        author: { type: Schema.Types.ObjectId, ref: "User", required: true },
+        author: { type: Schema.Types.ObjectId, ref: "user", required: true },
         category: { type: String, required: true },
         isDeleted: { type: Boolean, default: false },
     },

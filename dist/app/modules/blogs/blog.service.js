@@ -21,13 +21,13 @@ const createBlog = (blogData) => __awaiter(void 0, void 0, void 0, function* () 
     return yield blog_model_1.blogModel.create(blogData);
 });
 const getAllBlogs = () => __awaiter(void 0, void 0, void 0, function* () {
-    return yield blog_model_1.blogModel.find().populate("author", "name email").sort({ createdAt: -1 });
+    return yield blog_model_1.blogModel.find().populate("author", "name email photo role").sort({ createdAt: -1 });
 });
 const getSingleBlog = (id) => __awaiter(void 0, void 0, void 0, function* () {
     if (!mongoose_1.Types.ObjectId.isValid(id)) {
         throw new AppError_1.default(http_status_1.default.BAD_REQUEST, "Invalid blog ID");
     }
-    const result = yield blog_model_1.blogModel.findById(id).populate("author", "name email");
+    const result = yield blog_model_1.blogModel.findById(id).populate("author", "name email photo role");
     if (!result) {
         throw new AppError_1.default(http_status_1.default.NOT_FOUND, "Blog not found");
     }

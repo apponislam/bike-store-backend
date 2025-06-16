@@ -9,14 +9,14 @@ const createBlog = async (blogData: Blog) => {
 };
 
 const getAllBlogs = async () => {
-    return await blogModel.find().populate("author", "name email").sort({ createdAt: -1 });
+    return await blogModel.find().populate("author", "name email photo role").sort({ createdAt: -1 });
 };
 
 const getSingleBlog = async (id: string) => {
     if (!Types.ObjectId.isValid(id)) {
         throw new AppError(httpStatus.BAD_REQUEST, "Invalid blog ID");
     }
-    const result = await blogModel.findById(id).populate("author", "name email");
+    const result = await blogModel.findById(id).populate("author", "name email photo role");
     if (!result) {
         throw new AppError(httpStatus.NOT_FOUND, "Blog not found");
     }

@@ -13,14 +13,7 @@ const blogSchema = new mongoose_1.Schema({
 }, {
     timestamps: true,
     versionKey: false,
-    toJSON: {
-        virtuals: true,
-        transform: (doc, ret) => {
-            delete ret._id;
-            ret.id = ret._id;
-            return ret;
-        },
-    },
+    toJSON: { virtuals: true },
 });
 blogSchema.pre("find", function (next) {
     this.where({ isDeleted: { $ne: true } });

@@ -11,6 +11,7 @@ const globalErrorHandler_1 = __importDefault(require("./app/errors/globalErrorHa
 const notFount_1 = __importDefault(require("./app/errors/notFount"));
 const order_route_1 = __importDefault(require("./app/modules/Orders/order.route"));
 const contact_route_1 = require("./app/modules/Contacts/contact.route");
+const blog_route_1 = require("./app/modules/blogs/blog.route");
 const app = (0, express_1.default)();
 // const port = 3000;
 app.use(express_1.default.json());
@@ -19,6 +20,7 @@ app.use("/", product_route_1.productRoute);
 app.use("/", order_route_1.default);
 app.use("/", user_route_1.userRoute);
 app.use("/", contact_route_1.contactRoute);
+app.use("/", blog_route_1.blogRoute);
 app.get("/", (req, res) => {
     res.send("Bike Store is available");
 });

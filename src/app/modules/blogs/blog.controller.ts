@@ -53,13 +53,7 @@ const deleteBlog = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getMyBlogs = catchAsync(async (req: Request, res: Response) => {
-    const filters = {
-        category: req.query.category as string,
-        status: req.query.status as "published" | "draft",
-        search: req.query.search as string,
-    };
-
-    const result = await blogServices.getMyBlogs(req.user._id, filters);
+    const result = await blogServices.getMyBlogs(req.user._id);
     res.status(200).json({
         status: true,
         message: "Your blogs retrieved successfully",

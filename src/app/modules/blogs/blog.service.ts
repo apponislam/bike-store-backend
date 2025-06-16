@@ -57,30 +57,11 @@ const deleteBlog = async (id: string, userId: Types.ObjectId) => {
     return await blogModel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
 };
 
-const getMyBlogs = async (
-    userId: Types.ObjectId,
-    filters: {
-        category?: string;
-        status?: "published" | "draft";
-        search?: string;
-    } = {}
-) => {
+const getMyBlogs = async (userId: Types.ObjectId) => {
     const query: any = {
         author: userId,
         isDeleted: { $ne: true },
     };
-
-    if (filters.category) {
-        query.category = filters.category;
-    }
-
-    if (filters.status) {
-        query.status = filters.status;
-    }
-
-    if (filters.search) {
-        query.$or = [{ title: { $regex: filters.search, $options: "i" } }, { excerpt: { $regex: filters.search, $options: "i" } }];
-    }
 
     return await blogModel.find(query).populate("author", "name email photo role").sort({ createdAt: -1 });
 };

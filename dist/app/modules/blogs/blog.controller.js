@@ -60,12 +60,7 @@ const deleteBlog = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, voi
     });
 }));
 const getMyBlogs = (0, catchAsync_1.default)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const filters = {
-        category: req.query.category,
-        status: req.query.status,
-        search: req.query.search,
-    };
-    const result = yield blog_service_1.blogServices.getMyBlogs(req.user._id, filters);
+    const result = yield blog_service_1.blogServices.getMyBlogs(req.user._id);
     res.status(200).json({
         status: true,
         message: "Your blogs retrieved successfully",
